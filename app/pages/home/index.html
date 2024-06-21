@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="color-scheme" content="dark">
+        <title>NEXTMOVIES | HOME</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css">
+        <link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap' rel='stylesheet'>
+        <script src="/static/indexHome.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body { font-family: 'Roboto', sans-serif; background-color: #09080f; color: #e0e0e0; }
+            .menu-link { transition: color 0.3s ease; color: #bbbbbb; display: flex; align-items: center; }
+            .menu-link:hover { color: #1db954; }
+            .modern-nav { background-color: #0c0b14; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: width 0.5s ease-in-out; overflow: hidden; width: 256px; }
+            .modern-nav ul { padding: 0; margin: 0; list-style-type: none; font-size: 18px; display: flex; flex-direction: column; opacity: 1; transition: opacity 0.5s ease-in-out; }
+            .modern-nav li { padding: 15px 20px; display: flex; align-items: center; font-weight: bold; transition: background-color 0.3s ease; } 
+            .modern-nav li:last-child { border-bottom: none; }
+            .modern-nav li:hover { background-color: #1a1824; }
+            .modern-nav li a { flex-grow: 1; text-decoration: none; color: inherit; display: flex; align-items: center; }
+            .modern-nav li svg { margin-right: 10px; color: white; }
+            .collapse-btn { position: absolute; top: 22px; left: 10px; cursor: pointer; height: 29px; width: 24px; }
+            .movie-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 20px 0; overflow-x: auto; position: relative; }
+            .movie-item { width: 100%; position: relative; }
+            .movie-title { font-size: 20px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1.2px; }
+            .movie-description-container { background-color: #1a1824; padding: 10px; border-radius: 8px; margin-top: 5px; width: 80%; /* Match the image width */ }
+            .movie-description { font-size: 20px; color: #ccc; }
+            .scroll-arrow { cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background-color: #1db954; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+            .scroll-arrow.left { left: 10px; }
+            .scroll-arrow.right { right: 10px; }
+            .scroll-arrow i { color: white; font-size: 20px; }
+            .movie-item img { width: 80%; height: auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); transition: filter 0.3s ease; }
+            .movie-item:hover img { filter: blur(5px); }
+           
+            .movie-rating { font-size: 14px; color: #ffd700; }
+            .star-rating { display: inline-block; }
+            .star { color: #ffd700; }
+            .pagination-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+            .pagination-button { background-color: #1db954; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer; font-size: 16px; transition: background-color 0.3s ease; }
+            .pagination-button:hover { background-color: #17a74a; }
+            .pagination-number { background-color: #0c0b14; color: white; border: none; border-radius: 5px; padding: 10px 15px; cursor: pointer; font-size: 16px; transition: background-color 0.3s ease; }
+            .pagination-number:hover { background-color: #1a1824; }
+            .pagination-number.active { background-color: #1db954; }
+            .loading { position: relative; }
+            .loading::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(20px); background: rgba(0, 0, 0, 0.5); z-index: 1; }
+            .loading::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background: url('/static/Loading.png') no-repeat center center; background-size: cover; z-index: 2; animation: bounce 1s infinite; }
+            .loading-dots { position: absolute; top: 70%; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
+            .loading-dots div { width: 10px; height: 10px; background-color: #1db954; border-radius: 50%; animation: loading-dots 1s infinite; }
+            .loading-dots div:nth-child(1) { animation-delay: 0s; }
+            .loading-dots div:nth-child(2) { animation-delay: 0.2s; }
+            .loading-dots div:nth-child(3) { animation-delay: 0.4s; }
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) translateY(0); }
+                40% { transform: translate(-50%, -50%) translateY(-30px); }
+                60% { transform: translate(-50%, -50%) translateY(-15px); }
+            }
+            @keyframes loading-dots {
+                0%, 80%, 100% { transform: scale(1); }
+                40% { transform: scale(1.5); }
+            }
+            .movie-category { font-size: 15px; font-weight: bold; color: #fff; margin-bottom: 5px; border: 2px solid #0998e5; display: inline-block; padding: 10px; border-radius: 20px; margin-top: 13px;}
+            @media (max-width: 768px) {
+                .modern-nav { width: 100%; height: auto; position: relative; top: 0; left: 0; }
+                .modern-nav ul { flex-direction: row; flex-wrap: wrap; justify-content: space-around; }
+                .modern-nav li { padding: 10px; }
+                .movie-list { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+                .movie-item img { width: 100%; }
+                .movie-description-container { width: 100%;}
+                .pagination-buttons { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; }
+                .pagination-button, .pagination-number { width: auto; padding: 10px 15px; }
+                main { margin: 0; padding: 8px; width: 100%; margin-left: 0; }
+                .ml-64 {
+                    margin-left: 0;
+                    padding-left: 0;
+                    padding: 0;
+                }
+                .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(20px); background: rgba(0, 0, 0, 0.5); z-index: 1; display: flex; align-items: center; justify-content: center; }
+                .loading::before { width: 50px; height: 50px; }
+                .search-bar {
+                    margin: 10px auto !important;
+                }
+            }
+            .search-bar {
+                display: flex;
+                align-items: center;
+                background-color: #1a1824;
+                border-radius: 20px;
+                padding: 5px 10px;
+                margin: 10px;
+                width: 80%;
+                max-width: 400px;
+            }
+            .search-bar input {
+                background: none;
+                border: none;
+                outline: none;
+                color: #e0e0e0;
+                font-size: 16px;
+                flex-grow: 1;
+                padding: 5px;
+            }
+            .search-bar button {
+                background: none;
+                border: none;
+                color: #1db954;
+                cursor: pointer;
+                font-size: 20px;
+            }
+            .genre-dropdown {
+                background-color: #1a1824;
+                color: #e0e0e0;
+                border: none;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                margin-left: 1px;
+            }
+            .genre-dropdown:hover {
+                background-color: #1a1824;
+            }
+            .year-dropdown {
+                background-color: #1a1824;
+                color: #e0e0e0;
+                border: none;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                margin-left: 5px;
+            }
+            .year-dropdown:hover {
+                background-color: #1a1824;
+            }
+        </style>
+    </head>
+    <body class="text-gray-300">
+        <nav class="fixed top-0 left-0 h-full modern-nav">
+            <button class="collapse-btn" onclick="toggleNav()">☰</button>
+            <div class="p-5 text-light-blue-500 text-xl" style="font-family: 'Roboto', sans-serif; font-size: 24px; font-weight: bold; margin-left: 40px;" id="brand-name">
+                <span style="color: #0998e5;">NEXT</span>MOVIES
+            </div>
+            <div class="search-bar">
+                <input id="search" type="text" placeholder="Search...">
+                <button type="submit" style="margin-left: px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.48-5.34C15.36 5.59 13.28 3.5 10.5 3.5S5.64 5.59 5.64 8.39c0 2.8 2.08 4.89 4.86 4.89 1.61 0 3.06-.76 3.97-1.97l.27.28v.79l4.25 4.25c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-4.25-4.25zM10.5 12c-1.93 0-3.5-1.57-3.5-3.5S8.57 5 10.5 5s3.5 1.57 3.5 3.5S12.43 12 10.5 12z" fill="white"/></svg>
+                </button>
+            </div>
+            <ul id="nav-items">
+                <li>
+                    <a href="/movies" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M4 6h16v2H4V6zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" fill="white"/></svg>
+                        Movies
+                    </a>
+                </li>
+                <li>
+                    <a href="/tv-shows" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6l-2 2v1h10v-1l-2-2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" fill="white"/></svg>
+                        TV Shows
+                    </a>
+                </li>
+                <li>
+                    <a href="/domains" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" fill="white"/></svg>
+                        Domains
+                    </a>
+                </li>
+                <li>
+                    <a href="/servers" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M4 4h16v2H4zm0 6h16v2H4zm0 6h16v2H4z" fill="white"/><path d="M4 4h16v2H4zm0 6h16v2H4zm0 6h16v2H4z" fill="white"/></svg>
+                        Servers
+                    </a>
+                </li>
+                <li>
+                    <a href="/discord" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 55" width="24" height="20"><path d="M60.104 4.551a58.6 58.6 0 00-14.36-4.551.07.07 0 00-.075.037c-.6 1.08-1.27 2.497-1.75 3.617a55.23 55.23 0 00-16.05 0 48.76 48.76 0 00-1.83-3.617.07.07 0 00-.075-.037A58.58 58.58 0 0010.89 4.551a.064.064 0 00-.032.027C.666 19.731-.944 34.723.293 49.583a.08.08 0 00.031.055c6.06 4.45 11.94 7.17 17.76 8.926a.07.07 0 00.075-.027c1.36-1.86 2.58-3.82 3.67-5.87a.07.07 0 00-.037-.098 48.3 48.3 0 01-7.08-3.4.07.07 0 01-.007-.118c.48-.36.96-.73 1.42-1.11a.07.07 0 01.073-.01c14.86 6.8 30.93 6.8 45.68 0a.07.07 0 01.075.01c.47.38.95.75 1.43 1.11a.07.07 0 01-.006.118 47.8 47.8 0 01-7.08 3.4.07.07 0 00-.038.1c1.09 2.05 2.31 4.01 3.67 5.87a.07.07 0 00.075.028c5.84-1.76 11.72-4.48 17.78-8.927a.07.07 0 00.03-.054c1.5-15.79-.99-30.76-10.57-45.005a.06.06 0 00-.03-.028zM23.725 37.467c-3.17 0-5.77-2.9-5.77-6.47 0-3.57 2.57-6.47 5.77-6.47 3.18 0 5.77 2.91 5.76 6.47 0 3.57-2.57 6.47-5.76 6.47zm23.55 0c-3.17 0-5.77-2.9-5.77-6.47 0-3.57 2.57-6.47 5.77-6.47 3.18 0 5.77 2.91 5.76 6.47 0 3.57-2.57 6.47-5.76 6.47z" fill="white"/></svg>
+                        Discord
+                    </a>
+                </li>
+                <li>
+                    <div class="menu-link">
+                        
+                        <select id="categories-dropdown" class="ml-2 genre-dropdown">
+                            
+                        </select>
+                        <select id="year-dropdown" class="ml-2 year-dropdown">
+                            
+                        </select>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <main class="ml-64 p-8">
+           <div class="flex flex-col items-center justify-center min-h-screen">
+                
+                <div class="relative w-full">
+                    <div class="movie-list" id="new-movies">
+                        
+                        
+                    </div>
+                    <div class="movie-list" id="top-movies">
+                        
+                        
+                    </div>
+                    <div class="movie-list" id="upcoming-movies">
+                        
+                    </div>
+                </div>
+                <div class="pagination-buttons">
+                    <button class="pagination-button" onclick="previousPage()">Back</button>
+                    
+                    <button class="pagination-button" onclick="nextPage()">Next</button>
+                </div>
+           </div>
+        </main>
+       
+    </body>
+</html>
